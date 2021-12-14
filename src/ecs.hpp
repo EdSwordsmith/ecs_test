@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <vector>
+#include <bitset>
+
+#include "memorypool.hpp"
 
 typedef unsigned long long EntityID;
 const int MAX_COMPONENTS = 32;
@@ -18,30 +21,6 @@ int get_id()
     return componentId;
 }
 
-struct ComponentPool
-{
-    char *pData = nullptr;
-    size_t size = 0;
-
-    ComponentPool(size_t _size)
-    {
-        // We'll allocate enough memory to hold MAX_ENTITIES, each with element size
-        size = _size;
-        pData = new char[this->size * MAX_ENTITIES];
-    }
-
-    ~ComponentPool()
-    {
-        delete[] pData;
-    }
-
-    inline void *get(size_t index)
-    {
-        // looking up the component at the desired index
-        return pData + index * size;
-    }
-};
-
 struct Scene
 {
     struct EntityDesc
@@ -51,7 +30,7 @@ struct Scene
     };
 
     std::vector<EntityDesc> entities;
-    std::vector<ComponentPool *> componentPools;
+    std::vector<MemoryPool<void> *> componentPools;
 
     EntityID create()
     {
@@ -70,7 +49,7 @@ struct Scene
         }
         if (componentPools[componentId] == nullptr) // New component, make a new pool
         {
-            componentPools[componentId] = new ComponentPool(sizeof(T));
+            componentPools[componentId] = new MemoryPool<T>(MAX_ENTITIES);
         }
 
         // Looks up the component in the pool, and initializes it with placement new

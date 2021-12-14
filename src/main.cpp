@@ -1,17 +1,26 @@
 #include "ecs.hpp"
 
-struct Transform
+struct Component
+{
+
+};
+
+struct Transform : public Component
 {
     float x, y, z;
 };
 
-struct Color
+struct Color : public Component
 {
     int r, g, b;
 };
 
 int main()
 {
+    std::vector<Component> components;
+    Color c;
+    c.r = 255;
+
     std::cout << "Transform Id: " << get_id<Transform>() << std::endl;
     std::cout << "Color Id: " << get_id<Color>() << std::endl;
 
