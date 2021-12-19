@@ -9,15 +9,15 @@
 #include "memory/pool.hpp"
 
 typedef unsigned long long EntityID;
-const int MAX_ENTITIES = 32;
-typedef std::vector<bool> ComponentMask;
-
+const int START_ENTITIES = 2;
 int componentCounter;
 
 struct Scene
 {
     EntityID nextID = 0;
-    std::vector<bool> entityMasks;
+    EntityID currentCapacity = START_ENTITIES;
+
+    std::vector<bool> masks;
 
     std::vector<Memory::Pool<void> *> componentPools;
 
@@ -27,7 +27,7 @@ struct Scene
         assert(nextID == 0);
         auto id = get_component_id<T>();
         if (id >= componentPools.size())
-            componentPools.push_back(new Memory::Pool<T>(MAX_ENTITIES));
+            componentPools.push_back(new Memory::Pool<T>(START_ENTITIES));
     }
 
     template <class T>
@@ -41,7 +41,16 @@ struct Scene
     {
         if (nextID == 0)
         {
-            entityMasks.resize(MAX_ENTITIES * componentCounter);
+            masks.resize(START_ENTITIES * componentCounter);
+        }
+        else if (nextID == currentCapacity)
+        {
+            for (auto &pool: componentPools)
+            {
+                pool->resize(currentCapacity);
+            }
+
+            currentCapacity *= 2;
         }
 
         EntityID id = nextID++;
@@ -55,7 +64,7 @@ struct Scene
         assert(componentId < componentPools.size());
 
         T *pComponent = new (componentPools[componentId]->get(id)) T();
-        entityMasks[id * componentCounter + componentId] = true;
+        masks[id * componentCounter + componentId] = true;
 
         return pComponent;
     }
@@ -65,7 +74,7 @@ struct Scene
     {
         int componentId = get_component_id<T>();
 
-        if (!entityMasks[componentCounter * id + componentId])
+        if (!masks[componentCounter * id + componentId])
             return nullptr;
 
         T *pComponent = static_cast<T *>(componentPools[componentId]->get(id));

@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-g --std=gnu++20 -Wall
+CFLAGS=--std=gnu++20 -Wall
 
 .PHONY: all clean
 

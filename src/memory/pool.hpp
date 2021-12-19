@@ -19,6 +19,8 @@ namespace Memory
         Pool(size_t size, size_t alignment, size_t capacity);
         ~Pool();
 
+        void resize(size_t capacity);
+
         inline void *get(size_t index)
         {
             return _data + index * _size;
