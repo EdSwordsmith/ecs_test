@@ -16,23 +16,30 @@ int main()
     scene.register_component<Transform>();
     scene.register_component<Color>();
 
-    std::cout << "Transform Id: " << scene.get_component_id<Transform>() << std::endl;
-    std::cout << "Color Id: " << scene.get_component_id<Color>() << std::endl;
+    auto e1 = scene.create();
+    auto e2 = scene.create();
+    auto e3 = scene.create();
+    auto e4 = scene.create();
 
-    EntityID entity = scene.create();
-    Transform *transform = scene.add_component<Transform>(entity);
-    transform->x = 5;
+    auto *t1 = scene.add_component<Transform>(e1);
+    auto *t2 = scene.add_component<Transform>(e2);
+    auto *t4 = scene.add_component<Transform>(e4);
 
-    std::cout << scene.get_component<Transform>(entity)->x << std::endl;
+    auto *c1 = scene.add_component<Color>(e1);
+    auto *c3 = scene.add_component<Color>(e3);
+    auto *c4 = scene.add_component<Color>(e4);
 
-    EntityID e2 = scene.create();
-    auto *c2 = scene.add_component<Color>(e2);
-    EntityID e3 = scene.create();
-    auto *t3 = scene.add_component<Transform>(e3);
-    c2->g = 255;
-    t3->z = -4;
+    t1->x = 1;
+    t1->y = 2;
+    t4->z = 5;
+    c1->r = 255;
 
-    std::cout << scene.currentCapacity << std::endl;
-    std::cout << c2->g << std::endl;
-    std::cout << t3->z << std::endl;
+    for (EntityID entity : SceneView<Transform, Color>(scene))
+    {
+        auto *t = scene.get_component<Transform>(entity);
+        auto *c = scene.get_component<Color>(entity);
+
+        std::cout << "Transform: " << t->x << " " << t->y << " " << t->z << std::endl;
+        std::cout << "Color: " << c->r << " " << c->g << " " << c->b << std::endl;
+    }
 }

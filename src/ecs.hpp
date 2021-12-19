@@ -45,12 +45,13 @@ struct Scene
         }
         else if (nextID == currentCapacity)
         {
-            for (auto &pool: componentPools)
+            for (auto &pool : componentPools)
             {
                 pool->resize(currentCapacity);
             }
 
             currentCapacity *= 2;
+            masks.resize(currentCapacity * componentCounter);
         }
 
         EntityID id = nextID++;
@@ -79,6 +80,98 @@ struct Scene
 
         T *pComponent = static_cast<T *>(componentPools[componentId]->get(id));
         return pComponent;
+    }
+};
+
+template <typename... ComponentTypes>
+struct SceneView
+{
+    Scene *_scene;
+    std::vector<bool> mask;
+
+    SceneView(Scene &scene) : _scene(&scene)
+    {
+        mask.resize(componentCounter);
+
+        int componentIds[] = {_scene->get_component_id<ComponentTypes>()...};
+        for (auto id : componentIds)
+        {
+            mask[id] = true;
+        }
+    }
+
+    struct Iterator
+    {
+        Scene *_scene;
+        EntityID current;
+        std::vector<bool> *_mask;
+
+        Iterator(Scene *scene, EntityID index, std::vector<bool> &mask)
+            : _scene(scene), current(index), _mask(&mask) {}
+
+        EntityID operator*() const
+        {
+            return current;
+        }
+
+        bool operator==(const Iterator &other) const
+        {
+            return current == other.current || current == _scene->nextID;
+        }
+
+        bool operator!=(const Iterator &other) const
+        {
+            return current != other.current && current != _scene->nextID;
+        }
+
+        bool valid_id()
+        {
+            for (size_t i = 0; i < _mask->size(); i++)
+            {
+                if (_mask->at(i) && !_scene->masks[current * componentCounter + i])
+                    return false;
+            }
+
+            return true;
+        }
+
+        Iterator &operator++()
+        {
+            do
+            {
+                current++;
+            } while (current < _scene->nextID && !valid_id());
+            return *this;
+        }
+    };
+
+    bool valid_index(EntityID index)
+    {
+        for (size_t i = 0; i < mask.size(); i++)
+        {
+            if (mask[i] && !_scene->masks[index * componentCounter + i])
+                return false;
+        }
+
+        return true;
+    }
+
+    Iterator begin()
+    {
+        EntityID firstIndex = 0;
+        while (firstIndex < _scene->nextID && !valid_index(firstIndex))
+        {
+            firstIndex++;
+        }
+
+        Iterator it(_scene, firstIndex, mask);
+        return it;
+    }
+
+    Iterator end()
+    {
+        Iterator it(_scene, _scene->nextID, mask);
+        return it;
     }
 };
 
