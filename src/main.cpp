@@ -22,12 +22,12 @@ int main()
     auto e4 = scene.create();
 
     auto *t1 = scene.add_component<Transform>(e1);
-    auto *t2 = scene.add_component<Transform>(e2);
+    scene.add_component<Transform>(e2);
     auto *t4 = scene.add_component<Transform>(e4);
 
     auto *c1 = scene.add_component<Color>(e1);
-    auto *c3 = scene.add_component<Color>(e3);
-    auto *c4 = scene.add_component<Color>(e4);
+    scene.add_component<Color>(e3);
+    scene.add_component<Color>(e4);
 
     t1->x = 1;
     t1->y = 2;

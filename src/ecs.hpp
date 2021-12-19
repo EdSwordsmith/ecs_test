@@ -4,13 +4,12 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
-#include <bitset>
 
 #include "memory/pool.hpp"
 
 typedef unsigned long long EntityID;
 const int START_ENTITIES = 2;
-int componentCounter;
+int componentCounter = 0;
 
 struct Scene
 {
