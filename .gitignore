@@ -34,3 +34,5 @@
 
 build/
 .vscode/
+ecs_test
+ecs_test.dSYM/

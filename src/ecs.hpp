@@ -65,7 +65,7 @@ struct Scene
     {
         int componentId = get_component_id<T>();
 
-        if (entityMasks[componentCounter * id + componentId])
+        if (!entityMasks[componentCounter * id + componentId])
             return nullptr;
 
         T *pComponent = static_cast<T *>(componentPools[componentId]->get(id));
