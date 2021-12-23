@@ -9,7 +9,7 @@
 
 typedef unsigned long long EntityID;
 const int START_ENTITIES = 2;
-int componentCounter = 0;
+size_t componentCounter = 0;
 
 struct Scene {
   EntityID nextID = 0;
@@ -26,8 +26,8 @@ struct Scene {
       componentPools.push_back(new Memory::Pool<T>(START_ENTITIES));
   }
 
-  template <class T> int get_component_id() {
-    static int componentId = componentCounter++;
+  template <class T> size_t get_component_id() {
+    static size_t componentId = componentCounter++;
     return componentId;
   }
 
@@ -48,7 +48,7 @@ struct Scene {
   }
 
   template <typename T> T *add_component(EntityID id) {
-    int componentId = get_component_id<T>();
+    size_t componentId = get_component_id<T>();
     assert(componentId < componentPools.size());
 
     T *pComponent = new (componentPools[componentId]->get(id)) T();
@@ -60,7 +60,7 @@ struct Scene {
   }
 
   template <typename T> T *get_component(EntityID id) {
-    int componentId = get_component_id<T>();
+    size_t componentId = get_component_id<T>();
 
     if ((masks[id * (1 + componentCounter / 8) + componentId / 8] &
          (1 << componentId % 8)) == 0)
@@ -78,7 +78,7 @@ template <typename... ComponentTypes> struct SceneView {
   SceneView(Scene &scene) : _scene(&scene) {
     mask.resize(1 + componentCounter / 8);
 
-    int componentIds[] = {_scene->get_component_id<ComponentTypes>()...};
+    size_t componentIds[] = {_scene->get_component_id<ComponentTypes>()...};
     for (auto id : componentIds) {
       mask[id / 8] = mask[id / 8] | (1 << id % 8);
     }
