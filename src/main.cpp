@@ -21,11 +21,11 @@ int main()
     auto e3 = scene.create();
     auto e4 = scene.create();
 
-    auto *t1 = scene.add_component<Transform>(e1);
+    auto* t1 = scene.add_component<Transform>(e1);
     scene.add_component<Transform>(e2);
-    auto *t4 = scene.add_component<Transform>(e4);
+    auto* t4 = scene.add_component<Transform>(e4);
 
-    auto *c1 = scene.add_component<Color>(e1);
+    auto* c1 = scene.add_component<Color>(e1);
     scene.add_component<Color>(e3);
     scene.add_component<Color>(e4);
 
@@ -36,8 +36,8 @@ int main()
 
     for (EntityID entity : SceneView<Transform, Color>(scene))
     {
-        auto *t = scene.get_component<Transform>(entity);
-        auto *c = scene.get_component<Color>(entity);
+        auto* t = scene.get_component<Transform>(entity);
+        auto* c = scene.get_component<Color>(entity);
 
         std::cout << "Transform: " << t->x << " " << t->y << " " << t->z << std::endl;
         std::cout << "Color: " << c->r << " " << c->g << " " << c->b << std::endl;

@@ -6,13 +6,11 @@
 
 namespace Memory
 {
-    template <typename T>
-    class Pool;
+    template <typename T> class Pool;
 
-    template <>
-    class Pool<void>
+    template <> class Pool<void>
     {
-        uint8_t *_data;
+        uint8_t* _data;
         size_t _size;
 
     public:
@@ -21,29 +19,27 @@ namespace Memory
 
         void resize(size_t capacity);
 
-        inline void *get(size_t index)
+        inline void* get(size_t index)
         {
             return _data + index * _size;
         }
     };
 
-    template <typename T>
-    class Pool : public Pool<void>
+    template <typename T> class Pool : public Pool<void>
     {
     public:
         Pool(size_t capacity);
 
-        inline T *get(size_t index);
+        inline T* get(size_t index);
     };
 
-    template <typename T>
-    inline Pool<T>::Pool(size_t capacity)
-        : Pool<void>(sizeof(T), alignof(T), capacity) {}
-
-    template <typename T>
-    inline T *Pool<T>::get(size_t index)
+    template <typename T> inline Pool<T>::Pool(size_t capacity) : Pool<void>(sizeof(T), alignof(T), capacity)
     {
-        return static_cast<T *>(Pool<void>::get(index));
     }
-}
+
+    template <typename T> inline T* Pool<T>::get(size_t index)
+    {
+        return static_cast<T*>(Pool<void>::get(index));
+    }
+} // namespace Memory
 #endif /* MEMORY_POOL_HPP */
