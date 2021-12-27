@@ -21,6 +21,16 @@ class World {
     }
 
   public:
+    ~World() {
+        for (auto *storage : _storages) {
+            delete storage;
+        }
+
+        for (auto *resource : _resources) {
+            delete resource;
+        }
+    }
+
     template <typename T> size_t register_component(Storage<T> *storage) {
         assert(_masks.size() == 0);
         size_t component_id = get_component_id<T>();
