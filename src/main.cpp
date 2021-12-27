@@ -1,45 +1,46 @@
-#include "ecs.hpp"
+#include <iostream>
 
-struct Transform
-{
+#include "ecs/world.hpp"
+
+struct Player {};
+
+struct Position {
     float x, y, z;
 };
 
-struct Color
-{
-    int r, g, b;
+struct Velocity {
+    float x, y, z;
 };
 
-int main()
-{
-    Scene scene;
-    scene.register_component<Transform>();
-    scene.register_component<Color>();
+int main() {
+    World world;
+    world.register_component<Player>(new NullStorage<Player>());
+    world.register_component<Position>(new VecStorage<Position>());
+    world.register_component<Velocity>(new MapStorage<Velocity>());
 
-    auto e1 = scene.create();
-    auto e2 = scene.create();
-    auto e3 = scene.create();
-    auto e4 = scene.create();
+    auto player = world.create();
+    world.add_component<Position>(player, (Position){0, 5, 1});
+    world.add_component<Velocity>(player, (Velocity){0, 3, 1});
+    world.add_component<Player>(player, (Player){});
 
-    auto* t1 = scene.add_component<Transform>(e1);
-    scene.add_component<Transform>(e2);
-    auto* t4 = scene.add_component<Transform>(e4);
+    auto e2 = world.create();
+    world.add_component<Position>(e2, (Position){0, 8, 7});
 
-    auto* c1 = scene.add_component<Color>(e1);
-    scene.add_component<Color>(e3);
-    scene.add_component<Color>(e4);
+    auto e3 = world.create();
+    world.add_component<Position>(e3, (Position){0, 15, 7});
+    world.add_component<Velocity>(e3, (Velocity){0, 4, 1});
 
-    t1->x = 1;
-    t1->y = 2;
-    t4->z = 5;
-    c1->r = 255;
+    auto e4 = world.create();
+    world.add_component<Position>(e4, (Position){0, 12, 7});
+    world.add_component<Velocity>(e4, (Velocity){0, 5, 1});
 
-    for (EntityID entity : SceneView<Transform, Color>(scene))
-    {
-        auto* t = scene.get_component<Transform>(entity);
-        auto* c = scene.get_component<Color>(entity);
+    for (auto entity : WorldView<Position, Velocity>(world)) {
+        auto *pos = world.get_component<Position>(entity);
+        std::cout << pos->y << std::endl;
+    }
 
-        std::cout << "Transform: " << t->x << " " << t->y << " " << t->z << std::endl;
-        std::cout << "Color: " << c->r << " " << c->g << " " << c->b << std::endl;
+    for (auto entity : WorldView<Player, Position, Velocity>(world)) {
+        auto *pos = world.get_component<Position>(entity);
+        std::cout << pos->y << std::endl;
     }
 }

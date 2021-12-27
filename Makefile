@@ -1,11 +1,11 @@
 CC=g++
-CFLAGS=--std=gnu++20 -Wall
+CFLAGS=-std=gnu++20 -Wall
 
 .PHONY: all clean
 
 all: ecs_test
 
-ecs_test: src/main.cpp src/memory/pool.cpp
+ecs_test: src/main.cpp
 	$(CC) $(CFLAGS) $^ -g -o $@
 
 %.o: %.c
